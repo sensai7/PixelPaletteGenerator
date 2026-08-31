@@ -28,6 +28,12 @@
       .col.text-center {
   text-align: center;
 }
+      #pixelArtPreview {
+        width: 300px;
+        height: 450px;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+      }
     </style>
   </head>
   <body>
@@ -134,6 +140,13 @@
           <!-- Color squares will be dynamically generated here -->
         </div>
       </div>
+
+      <!-- Pixel Art Preview -->
+      <div class="row mb-4">
+        <div class="col text-center">
+          <canvas id="pixelArtPreview" aria-label="Pixel art palette preview"></canvas>
+        </div>
+      </div>
       
       <!-- Button Bar -->
       <div class="row mb-4">
@@ -161,6 +174,7 @@
 	        </p>
 	    </footer>
     
+    <script src="pixel-art-data.js"></script>
     <script>
 
 
@@ -307,6 +321,28 @@
 			//console.log(newColor);
 			colorSquares1.innerHTML += `<div class="color-square" style="background-color: ${newColor};"><div class="color-code">${newColor}</div></div>`;
 
+		}
+		renderPixelArt(numColors);
+	}
+
+	function renderPixelArt(numColors) {
+		const palette = Array.from(document.querySelectorAll('#colorSquares1 .color-code'))
+			.map(element => element.textContent.trim());
+		const canvas = document.getElementById('pixelArtPreview');
+		const imageData = pixelArtData[numColors];
+		const scale = 10;
+		canvas.width = imageData.width * scale;
+		canvas.height = imageData.height * scale;
+		const context = canvas.getContext('2d');
+		context.imageSmoothingEnabled = false;
+
+		for (let y = 0; y < imageData.height; y++) {
+			for (let x = 0; x < imageData.width; x++) {
+				const pixelIndex = y * imageData.width + x;
+				const paletteIndex = parseInt(imageData.pixels[pixelIndex], 36);
+				context.fillStyle = palette[paletteIndex];
+				context.fillRect(x * scale, y * scale, scale, scale);
+			}
 		}
 	}
 
